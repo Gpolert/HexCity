@@ -1,0 +1,76 @@
+<h2 id="control-elements">Control elements</h2><p><dl class="api-incut"><ul class="page-contents"><li><a href="#description">Description</a></li><li><a href="#hide-the default control elements">Hide the default control elements</a></li><li><a href="#the-display of control elements in different parts of the map">The display of control elements in different parts of the map</a></li></ul></dl></p>
+<h3 id="description">Description</h3><p>The following are examples of adding, placing, and working with control elements. For more information about the work
+with control elements use the <a href="/doc/maps/en/manual/controls">Controls</a> section of documentation.</p>
+<h3 id="hide-the default control elements">Hide the default control elements</h3><p>If you need to obtain a &quot;clear&quot; map, with no extra control elements, then the following example will help you:</p>
+<script src="https://maps.api.2gis.ru/2.0/loader.js"></script>
+<div id="map" style="width: 100%; height: 400px;"></div>
+<script>
+    DG.then(function() {
+        var map = DG.map('map', {
+            center: [54.98, 82.89],
+            zoom: 13,
+            fullscreenControl: false,
+            zoomControl: false
+        });
+    });
+</script>
+
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+    &lt;head&gt;
+        &lt;title&gt;Hide control elements by default&lt;/title&gt;
+        &lt;script src=&quot;https://maps.api.2gis.ru/2.0/loader.js&quot;&gt;&lt;/script&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;div id=&quot;map&quot; style=&quot;width: 100%; height: 400px;&quot;&gt;&lt;/div&gt;
+        &lt;script&gt;
+            DG.then(function() {
+                var map = DG.map(&#39;map&#39;, {
+                    center: [54.98, 82.89],
+                    zoom: 13,
+                    fullscreenControl: false,
+                    zoomControl: false
+                });
+            });
+        &lt;/script&gt;
+    &lt;/body&gt;
+&lt;/html&gt;
+</code></pre><h3 id="the-display of control elements in different parts of the map">The display of control elements in different parts of the map</h3><p><div id="map1" style="width: 100%; height: 400px;"></div></p>
+<script>
+    DG.then(function() {
+        var map = DG.map('map1', {
+            center: [54.98, 82.89],
+            zoom: 13
+        });
+
+        DG.control.location({position: 'bottomright'}).addTo(map);
+        DG.control.scale().addTo(map);
+        DG.control.ruler({position: 'bottomleft'}).addTo(map);
+        DG.control.traffic().addTo(map);
+    });
+</script>
+
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+    &lt;head&gt;
+        &lt;title&gt;Dislay of control elements in different parts of the map&lt;/title&gt;
+        &lt;script src=&quot;https://maps.api.2gis.ru/2.0/loader.js&quot;&gt;&lt;/script&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;div id=&quot;map&quot; style=&quot;width: 100%; height: 400px;&quot;&gt;&lt;/div&gt;
+        &lt;script&gt;
+            DG.then(function() {
+                var map = DG.map(&#39;map&#39;, {
+                    center: [54.98, 82.89],
+                    zoom: 13
+                });
+
+                DG.control.location({position: &#39;bottomright&#39;}).addTo(map);
+                DG.control.scale().addTo(map);
+                DG.control.ruler({position: &#39;bottomleft&#39;}).addTo(map);
+                DG.control.traffic().addTo(map);
+            });
+        &lt;/script&gt;
+    &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>

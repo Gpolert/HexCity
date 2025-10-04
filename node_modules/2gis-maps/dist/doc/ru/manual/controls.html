@@ -1,0 +1,336 @@
+<h2 id="элементы-управления">Элементы управления</h2><p>Элементы управления — это компоненты интерфейса, с помощью которых пользователь может взаимодействовать с картой.</p>
+<p><dl class="api-incut"><ul class="page-contents"><li><a href="#dgcontrol.zoom">DG.Control.Zoom</a><ul><li><a href="#создание">Создание</a></li><li><a href="#опции">Опции</a></li><li><a href="#методы">Методы</a></li></ul></li><li><a href="#dgcontrol.attribution">DG.Control.Attribution</a><ul><li><a href="#создание-1">Создание</a></li><li><a href="#опции-1">Опции</a></li><li><a href="#методы-1">Методы</a></li></ul></li><li><a href="#dgcontrol.scale">DG.Control.Scale</a><ul><li><a href="#создание-2">Создание</a></li><li><a href="#опции-2">Опции</a></li><li><a href="#методы-2">Методы</a></li></ul></li><li><a href="#dgcontrol.ruler">DG.Control.Ruler</a><ul><li><a href="#создание-3">Создание</a></li><li><a href="#опции-3">Опции</a></li><li><a href="#методы-3">Методы</a></li></ul></li><li><a href="#dgcontrol.traffic">DG.Control.Traffic</a><ul><li><a href="#создание-4">Создание</a></li><li><a href="#опции-4">Опции</a></li><li><a href="#методы-4">Методы</a></li></ul></li><li><a href="#dgcontrol.fullscreen">DG.Control.Fullscreen</a><ul><li><a href="#создание-5">Создание</a></li><li><a href="#опции-5">Опции</a></li><li><a href="#методы-5">Методы</a></li></ul></li><li><a href="#dgcontrol.locationcontrol">DG.Control.LocationControl</a><ul><li><a href="#создание-6">Создание</a></li><li><a href="#опции-6">Опции</a></li><li><a href="#методы-6">Методы</a></li></ul></dl></p>
+<h3 id="dgcontrol.zoom">DG.Control.Zoom</h3><p>Базовый элемент управления масштабом с двумя кнопками (приблизить и отдалить). Добавляется на карту по умолчанию,
+если не передана <a href="/doc/maps/ru/manual/map#map-zoomcontrol">опция <code>zoomControl</code></a> со значением <code>false</code>.
+Расширяет <a href="/doc/maps/ru/manual/base-classes#dgcontrol"><code>DG.Control</code></a>.</p>
+<h4 id="создание">Создание</h4><table>
+    <thead>
+        <tr>
+            <th>Конструктор</th>
+            <th>Описание</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr id="control-zoom-l-control-zoom">
+            <td><code><b>DG.control.zoom</b>(
+                <nobr>&lt;<a href="#control-zoom-option">DG.Control.Zoom options</a>&gt; <i>options</i> )</nobr>
+            </code></td>
+            <td>Создает элемент управления масштабом.</td>
+        </tr>
+    </tbody>
+</table>
+
+<h4 id="опции">Опции</h4><table>
+    <thead>
+        <tr>
+            <th>Опция</th>
+            <th>Тип</th>
+            <th>Значение<br>по умолчанию</th>
+            <th>Описание</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr id="control-zoom-zoomintext">
+            <td><code><b>zoomInText</b></code></td>
+            <td><code>String </code></td>
+            <td><code>&#x27;+&#x27;</code></td>
+            <td>Текст кнопки &#39;приблизить&#39;.</td>
+        </tr>
+        <tr id="control-zoom-zoomintitle">
+            <td><code><b>zoomInTitle</b></code></td>
+            <td><code>String </code></td>
+            <td><code>&#x27;Zoom in&#x27;</code></td>
+            <td>Значение атрибута title для конпки &#39;приблизить&#39;.</td>
+        </tr>
+        <tr id="control-zoom-zoomouttext">
+            <td><code><b>zoomOutText</b></code></td>
+            <td><code>String </code></td>
+            <td><code>&#x27;-&#x27;</code></td>
+            <td>Текст кнопки &#39;Отдалить&#39;.</td>
+        </tr>
+        <tr id="control-zoom-zoomouttitle">
+            <td><code><b>zoomOutTitle</b></code></td>
+            <td><code>String </code></td>
+            <td><code>&#x27;Zoom out&#x27;</code></td>
+            <td>Значение атрибута title для конпки &#39;отдалить&#39;.</td>
+        </tr>
+    </tbody>
+</table>
+
+<p>Опции, унаследованные от <a href="/doc/maps/ru/manual/base-classes#dgcontrol">Control</a> <!-- TODO: include options --></p>
+<h4 id="методы">Методы</h4><p>Методы, унаследованные от <a href="/doc/maps/ru/manual/base-classes#dgcontrol">Control</a> <!-- TODO: include options --></p>
+<h3 id="dgcontrol.attribution">DG.Control.Attribution</h3><p>Позволяет показать информацию об авторстве в небольшом текстовом контейнере на карте. Добавляется на карту по умолчанию,
+если значение опции <a href="/doc/maps/ru/manual/map#map-attributioncontrol"><code>attributionControl</code></a>
+не выставлено в <code>false</code>. Компонует итоговый текст из слоев, вызывая их метод
+<a href="/doc/maps/ru/manual/base-classes#layer-getattribution"><code>getAttribution</code></a>.
+Расширяет <a href="/doc/maps/ru/manual/base-classes#dgcontrol"><code>DG.Control</code></a>.</p>
+<h4 id="создание-1">Создание</h4><table>
+    <thead>
+        <tr>
+            <th>Конструктор</th>
+            <th>Описание</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr id="control-attribution-l-control-attribution">
+            <td><code><b>DG.control.attribution</b>(
+                <nobr>&lt;<a href="#control-attribution-option">DG.Control.Attribution options</a>&gt; <i>options</i> )</nobr>
+            </code></td>
+            <td>Создает элемент с информацией об авторстве.</td>
+        </tr>
+    </tbody>
+</table>
+
+<h4 id="опции-1">Опции</h4><table>
+    <thead>
+        <tr>
+            <th>Опция</th>
+            <th>Тип</th>
+            <th>Значение<br>по умолчанию</th>
+            <th>Описание</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr id="control-attribution-prefix">
+            <td><code><b>prefix</b></code></td>
+            <td><code>String </code></td>
+            <td><code>&#x27;Leaflet&#x27;</code></td>
+            <td>Текст в формате HTML, который будет отображен перед информацией об авторстве.
+                Для отключения необходимо передать <code>false</code>.</td>
+        </tr>
+    </tbody>
+</table>
+
+<p>Опции, унаследованные от <a href="/doc/maps/ru/manual/base-classes#dgcontrol">Control</a> <!-- TODO: include options --></p>
+<h4 id="методы-1">Методы</h4><table>
+    <thead>
+    <tr>
+        <th>Метод</th>
+        <th>Возвращает</th>
+        <th>Описание</th>
+    </tr>
+    </thead>
+    <tbody>
+        <tr id="control-attribution-setprefix">
+            <td><code><b>setPrefix</b>(
+                <nobr>&lt;String&gt; <i>prefix</i> )</nobr>
+            </code></td>
+
+            <td><code>this</code></td>
+            <td>Добавляет текст перед информацией об авторстве.</td>
+        </tr>
+        <tr id="control-attribution-addattribution">
+            <td><code><b>addAttribution</b>(
+                <nobr>&lt;String&gt; <i>text</i> )</nobr>
+            </code></td>
+
+            <td><code>this</code></td>
+            <td>Добавляет информацию об авторстве (например, <code>&#39;Картографические данные 2GIS&#39;</code>).</td>
+        </tr>
+        <tr id="control-attribution-removeattribution">
+            <td><code><b>removeAttribution</b>(
+                <nobr>&lt;String&gt; <i>text</i> )</nobr>
+            </code></td>
+
+            <td><code>this</code></td>
+            <td>Удаляет информацию об авторстве.</td>
+        </tr>
+    </tbody>
+</table>
+
+<p>Методы, унаследованные от <a href="/doc/maps/ru/manual/base-classes#dgcontrol">Control</a> <!-- TODO: include options --></p>
+<h3 id="dgcontrol.scale">DG.Control.Scale</h3><p>Показывает масштаб карты в метрической (метры, километры) и английской (мили, футы) системах измерений.
+Расширяет <a href="/doc/maps/ru/manual/base-classes#dgcontrol"><code>DG.Control</code></a>.</p>
+<pre><code>DG.control.scale().addTo(map);
+</code></pre><h4 id="создание-2">Создание</h4><table>
+    <thead>
+        <tr>
+            <th>Конструктор</th>
+            <th>Описание</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr id="control-scale-l-control-scale">
+            <td><code><b>DG.control.scale</b>(
+                <nobr>&lt;<a href="#control-scale-option">DG.Control.Scale options</a>&gt; <i>options?</i> )</nobr>
+            </code></td>
+            <td>Создает индикатор масштаба.</td>
+        </tr>
+    </tbody>
+</table>
+
+<h4 id="опции-2">Опции</h4><table>
+    <thead>
+        <tr>
+            <th>Опция</th>
+            <th>Тип</th>
+            <th>Значение<br>по умолчанию</th>
+            <th>Описание</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr id="control-scale-maxwidth">
+            <td><code><b>maxWidth</b></code></td>
+            <td><code>Number </code></td>
+            <td><code>100</code></td>
+            <td>Максимальная ширина элемента в пикселях.</td>
+        </tr>
+        <tr id="control-scale-metric">
+            <td><code><b>metric</b></code></td>
+            <td><code>Boolean </code></td>
+            <td><code>True</code></td>
+            <td>Включает или отключает метрическую систему измерений (метры, километры).</td>
+        </tr>
+        <tr id="control-scale-imperial">
+            <td><code><b>imperial</b></code></td>
+            <td><code>Boolean </code></td>
+            <td><code>True</code></td>
+            <td>Включает или отключает английскую систему измерений (мили, футы).</td>
+        </tr>
+        <tr id="control-scale-updatewhenidle">
+            <td><code><b>updateWhenIdle</b></code></td>
+            <td><code>Boolean </code></td>
+            <td><code>false</code></td>
+            <td>При значении <code>true</code>, элемент будет обновляться только при возникновении события
+                <a href="/doc/maps/ru/manual/map#map-moveend"><code>moveend</code></a>, в противном случае, при каждом событии
+                <a href="/doc/maps/ru/manual/map#map-move"><code>move</code></a>.</td>
+        </tr>
+    </tbody>
+</table>
+
+<p>Опции, унаследованные от <a href="/doc/maps/ru/manual/base-classes#dgcontrol">Control</a> <!-- TODO: include options --></p>
+<h4 id="методы-2">Методы</h4><p>Методы, унаследованные от <a href="/doc/maps/ru/manual/base-classes#dgcontrol">Control</a> <!-- TODO: include options --></p>
+<h3 id="dgcontrol.ruler">DG.Control.Ruler</h3><p>Кнопка включения отображения линейки для измерения расстояний на карте.
+Расширяет <a href="/doc/maps/ru/manual/base-classes#dgcontrol"><code>DG.Control</code></a>.</p>
+<pre><code>DG.control.ruler().addTo(map);
+</code></pre><h4 id="создание-3">Создание</h4><table>
+    <thead>
+        <tr>
+            <th>Конструктор</th>
+            <th>Описание</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr id="control-ruler-l-control-ruler">
+            <td><code><b>DG.control.ruler</b>(
+                <nobr>&lt;<a href="#control-ruler-option">DG.Control.Ruler options</a>&gt; <i>options?</i> )</nobr>
+            </code></td>
+            <td>Создает кнопку включения отображения линейки.</td>
+        </tr>
+    </tbody>
+</table>
+
+<h4 id="опции-3">Опции</h4><p>Опции, унаследованные от <a href="/doc/maps/ru/manual/base-classes#dgcontrol">Control</a> <!-- TODO: include options --></p>
+<h4 id="методы-3">Методы</h4><p>Методы, унаследованные от <a href="/doc/maps/ru/manual/base-classes#dgcontrol">Control</a> <!-- TODO: include options --></p>
+<h3 id="dgcontrol.traffic">DG.Control.Traffic</h3><p>Кнопка включения отображения слоя пробок на карте.
+Расширяет <a href="/doc/maps/ru/manual/base-classes#dgcontrol"><code>DG.Control</code></a>.</p>
+<pre><code>DG.control.traffic().addTo(map);
+</code></pre><h4 id="создание-4">Создание</h4><table>
+    <thead>
+        <tr>
+            <th>Конструктор</th>
+            <th>Описание</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr id="control-traffic-l-control-traffic">
+            <td><code><b>DG.control.traffic</b>(
+                <nobr>&lt;<a href="#control-traffic-option">DG.Control.Traffic options</a>&gt; <i>options?</i> )</nobr>
+            </code></td>
+            <td>Создает элемент управления слоем пробок.</td>
+        </tr>
+    </tbody>
+</table>
+
+<h4 id="опции-4">Опции</h4><p>Опции, унаследованные от <a href="/doc/maps/ru/manual/base-classes#dgcontrol">Control</a> <!-- TODO: include options --></p>
+<h4 id="методы-4">Методы</h4><p>Методы, унаследованные от <a href="/doc/maps/ru/manual/base-classes#dgcontrol">Control</a> <!-- TODO: include options --></p>
+<h3 id="dgcontrol.fullscreen">DG.Control.Fullscreen</h3><p>Кнопка включения полноэкранного отображения карты, повторный клик в кнопку
+восстанавливает исходный размер карты. Добавляется на карту по умолчанию,
+если не передана опция <code>fullscreenControl</code> со значением <code>false</code>.
+Расширяет <a href="/doc/maps/ru/manual/base-classes#dgcontrol"><code>DG.Control</code></a>.</p>
+<pre><code>DG.control.fullscreen().addTo(map);
+</code></pre><h4 id="создание-5">Создание</h4><table>
+    <thead>
+        <tr>
+            <th>Конструктор</th>
+            <th>Описание</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr id="control-fullscreen-l-control-fullscreen">
+            <td><code><b>DG.control.fullscreen</b>(
+                <nobr>&lt;<a href="#control-fullscreen-option">DG.Control.Fullscreen options</a>&gt; <i>options?</i> )</nobr>
+            </code></td>
+            <td>Создает элемент управления полноэкранным режимом.</td>
+        </tr>
+    </tbody>
+</table>
+
+<h4 id="опции-5">Опции</h4><p>Опции, унаследованные от <a href="/doc/maps/ru/manual/base-classes#dgcontrol">Control</a> <!-- TODO: include options --></p>
+<h4 id="методы-5">Методы</h4><p>Методы, унаследованные от <a href="/doc/maps/ru/manual/base-classes#dgcontrol">Control</a> <!-- TODO: include options --></p>
+<h3 id="dgcontrol.locationcontrol">DG.Control.LocationControl</h3><p>Элемент управление (кнопка), при клике на которую определяется и отображается текущее месторасположение пользователя.
+Если API геолокации не поддерживается устройством, тогда элемент управления не выводится.</p>
+<pre><code>DG.control.location().addTo(map);
+</code></pre><h4 id="создание-6">Создание</h4><table>
+    <thead>
+        <tr>
+            <th>Конструктор</th>
+            <th>Описание</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr id="control-location-l-control-location">
+            <td><code><b>DG.control.location</b>(
+                <nobr>&lt;<a href="#control-location-option">DG.Control.LocationControl options</a>&gt; <i>options?</i> )</nobr>
+            </code></td>
+            <td>Создает элемент управления геопозиционированием.</td>
+        </tr>
+    </tbody>
+</table>
+
+<h4 id="опции-6">Опции</h4><table>
+    <thead>
+        <tr>
+            <th>Опция</th>
+            <th>Тип</th>
+            <th>Значение<br>по умолчанию</th>
+            <th>Описание</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr id="control-location-drawcircle">
+            <td><code><b>drawCircle</b></code></td>
+            <td><code>Boolean </code></td>
+            <td><code>true</code></td>
+            <td>Будет ли отображаться круг, показывающий точность определения месторасположения.</td>
+        </tr>
+        <tr id="control-location-follow">
+            <td><code><b>follow</b></code></td>
+            <td><code>Boolean </code></td>
+            <td><code>false</code></td>
+            <td>Динамическое обновление месторасположения пользователя, работает, если <code>watch</code> и
+                <code>setView</code> выставлены в <code>true</code>.</td>
+        </tr>
+        <tr id="control-location-stopfollowingondrag">
+            <td><code><b>stopFollowingOnDrag</b></code></td>
+            <td><code>Boolean </code></td>
+            <td><code>false</code></td>
+            <td>Включает или отключает обновление месторасположения пользователя при перетаскивании карты.</td>
+        </tr>
+        <tr id="control-location-metric">
+            <td><code><b>metric</b></code></td>
+            <td><code>Boolean </code></td>
+            <td><code>true</code></td>
+            <td>Использовать метрические или английские единицы измерения.</td>
+        </tr>
+        <tr id="control-location-locateoptions">
+            <td><code><b>locateOptions</b></code></td>
+            <td><code>Object </code></td>
+            <td><code></code></td>
+            <td>См. <a href="/doc/maps/ru/manual/map#geolocation-options">geo-location options</a>.</td>
+        </tr>
+    </tbody>
+</table>
+
+<p>Опции, унаследованные от <a href="/doc/maps/ru/manual/base-classes#dgcontrol">Control</a> <!-- TODO: include options --></p>
+<h4 id="методы-6">Методы</h4><p>Методы, унаследованные от <a href="/doc/maps/ru/manual/base-classes#dgcontrol">Control</a> <!-- TODO: include options --></p>

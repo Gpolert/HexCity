@@ -1,0 +1,269 @@
+<h2 id="work-with popups">Work with popups</h2><p><dl class="api-incut"><ul class="page-contents"><li><a href="#description">Description</a></li><li><a href="#open-a popup by clicking on a marker">Open a popup by clicking on a marker</a></li><li><a href="#open-a popup by default and on demand">Open a popup by default and on demand</a></li><li><a href="#add-several popups to the map">Add several popups to the map</a></li><li><a href="#the-behavior of a popup with the sprawling parameter">The behavior of a popup with the sprawling parameter</a></li></ul></dl></p>
+<h3 id="description">Description</h3><p>The following are examples of usage of pop-ups.
+For more information go to the <a href="/doc/maps/en/manual/popup">Popups</a> section of documentation.</p>
+<h3 id="open-a popup by clicking on a marker">Open a popup by clicking on a marker</h3><script src="https://maps.api.2gis.ru/2.0/loader.js"></script>
+<div id="map" style="width: 100%; height: 400px;"></div>
+<script>
+    DG.then(function () {
+        var map = DG.map('map', {
+            center: [54.98, 82.89],
+            zoom: 15
+        });
+
+        DG.marker([54.98, 82.89]).addTo(map).bindPopup('I am a popup!');
+    });
+</script>
+
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+    &lt;head&gt;
+        &lt;title&gt;Opens a popup when clicking on the marker&lt;/title&gt;
+        &lt;script src=&quot;https://maps.api.2gis.ru/2.0/loader.js&quot;&gt;&lt;/script&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;div id=&quot;map&quot; style=&quot;width: 100%; height: 400px;&quot;&gt;&lt;/div&gt;
+        &lt;script&gt;
+            DG.then(function() {
+                var map = DG.map(&#39;map&#39;, {
+                    center: [54.98, 82.89],
+                    zoom: 15
+                });
+
+                DG.marker([54.98, 82.89]).addTo(map).bindPopup(&#39;I am a popup!&#39;);
+            });
+        &lt;/script&gt;
+    &lt;/body&gt;
+&lt;/html&gt;
+</code></pre><h3 id="open-a popup by default and on demand">Open a popup by default and on demand</h3><p><input id="showPopup" type="button" value="Open popup" /></p>
+<p><div id="map1" style="width: 100%; height: 400px;"></div></p>
+<script>
+    var showButton = document.getElementById('showPopup');
+
+    DG.then(function() {
+        var map,
+            myPopUp;
+
+        map = DG.map('map1', {
+            center: [54.98, 82.89],
+            zoom: 13
+        });
+
+        DG.popup([54.98, 82.89])
+            .setLatLng([54.98, 82.89])
+            .setContent('I am opened by default')
+            .openOn(map);
+
+        myPopUp = DG.popup()
+            .setLatLng([54.98, 82.89])
+            .setContent('I have been opened on demand and closed the previous popup!');
+
+        showButton.onclick = function() {myPopUp.openOn(map)};
+    });
+</script>
+
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+    &lt;head&gt;
+        &lt;title&gt;Open a popup by default and on demand&lt;/title&gt;
+        &lt;script src=&quot;https://maps.api.2gis.ru/2.0/loader.js&quot;&gt;&lt;/script&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;input id=&quot;showPopup&quot; type=&quot;button&quot; value=&quot;Открыть попап&quot; /&gt;
+        &lt;div id=&quot;map&quot; style=&quot;width: 100%; height: 400px;&quot;&gt;&lt;/div&gt;
+        &lt;script&gt;
+            var showButton = document.getElementById(&#39;showPopup&#39;);
+
+            DG.then(function() {
+                var map,
+                    myPopUp;
+
+                map = DG.map(&#39;map&#39;, {
+                    center: [54.98, 82.89],
+                    zoom: 13
+                });
+
+                DG.popup([54.98, 82.89])
+                    .setLatLng([54.98, 82.89])
+                    .setContent(&#39;I am opened by default&#39;)
+                    .openOn(map);
+
+                myPopUp = DG.popup()
+                    .setLatLng([54.98, 82.89])
+                    .setContent(&#39;I have been opened on demand and closed the previous popup!&#39;);
+
+                showButton.onclick = function() {myPopUp.openOn(map)};
+            });
+        &lt;/script&gt;
+    &lt;/body&gt;
+&lt;/html&gt;
+</code></pre><h3 id="add-several popups to the map">Add several popups to the map</h3><p><div id="map2" style="width: 100%; height: 400px;"></div></p>
+<script>
+    DG.then(function() {
+        var map,
+            popups = DG.featureGroup(),
+            coordinates = [];
+
+        map = DG.map('map2', {
+            center: [54.98, 82.89],
+            zoom: 13
+        });
+
+        for (var i = 0; i < 10; i++) {
+            coordinates[0] = 54.98 - Math.random();
+            coordinates[1] = 82.89 + Math.random();
+            DG.popup()
+                .setLatLng(coordinates)
+                .setContent('I am popup №' + i)
+                .addTo(popups);
+        }
+
+        popups.addTo(map);
+        map.fitBounds(popups.getBounds());
+    });
+</script>
+
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+    &lt;head&gt;
+        &lt;title&gt;Add several popups to the map&lt;/title&gt;
+        &lt;script src=&quot;https://maps.api.2gis.ru/2.0/loader.js&quot;&gt;&lt;/script&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;div id=&quot;map&quot; style=&quot;width: 100%; height: 400px;&quot;&gt;&lt;/div&gt;
+        &lt;script&gt;
+            DG.then(function() {
+                var map,
+                    popups = DG.featureGroup(),
+                    coordinates = [];
+
+                map = DG.map(&#39;map&#39;, {
+                    center: [54.98, 82.89],
+                    zoom: 13
+                });
+
+                // create 10 popups in random places and add them to the group
+                for (var i = 0; i &lt; 10; i++) {
+                    coordinates[0] = 54.98 - Math.random();
+                    coordinates[1] = 82.89 + Math.random();
+                    DG.popup()
+                        .setLatLng(coordinates)
+                        .setContent(&#39;I am popup №&#39; + i)
+                        .addTo(popups);
+                }
+
+                popups.addTo(map);
+
+                // focus the scope on popups
+                map.fitBounds(popups.getBounds());
+            });
+        &lt;/script&gt;
+    &lt;/body&gt;
+&lt;/html&gt;
+</code></pre><h3 id="the-behavior of a popup with the sprawling parameter">The behavior of a popup with the sprawling parameter</h3><p><div id="map3" style="width: 300px; height: 150px;"></div></p>
+<p><input style="width: 300px;" type="button" id="sprawling" value="The popup with enabled sprawling parameter" /></p>
+<p><input style="width: 300px;" type="button" id="no-sprawling" value="Popup without the sprawling parameter" /></p>
+<p><input style="width: 300px;" type="button" id="minWidth" value="Popup with a minimum width of 320px" /></p>
+<script>
+    DG.then(function () {
+        var latLng = DG.latLng([54.98, 82.89]),
+            map = DG.map('map3', {
+                center: latLng,
+                zoom: 13,
+                fullscreenControl: false,
+                zoomControl: false
+            });
+
+        document.getElementById('sprawling').onclick = function () {
+            DG.popup({
+                maxWidth: 350,
+                sprawling: true
+            })
+            .setLatLng(latLng)
+            .setContent('I am a popup!')
+            .openOn(map);
+        };
+
+        document.getElementById('no-sprawling').onclick = function () {
+            DG.popup({
+                maxWidth: 350
+            })
+            .setLatLng(latLng)
+            .setContent('I am a popup!')
+            .openOn(map);
+        };
+
+        document.getElementById('minWidth').onclick = function () {
+            DG.popup({
+                maxWidth: 350,
+                minWidth: 320
+            })
+            .setLatLng(latLng)
+            .setContent('I am a popup!')
+            .openOn(map);
+        };
+    });
+</script>
+
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+    &lt;head&gt;
+        &lt;title&gt;Behaviour of the popup with the sprawling parameter&lt;/title&gt;
+        &lt;script src=&quot;https://maps.api.2gis.ru/2.0/loader.js&quot;&gt;&lt;/script&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;div id=&quot;map&quot; style=&quot;width: 300px; height: 150px;&quot;&gt;&lt;/div&gt;
+        &lt;input style=&quot;width: 300px;&quot; type=&quot;button&quot; id=&quot;sprawling&quot; value=&quot;The popup with enabled sprawling parameter&quot; /&gt;
+        &lt;input style=&quot;width: 300px;&quot; type=&quot;button&quot; id=&quot;no-sprawling&quot; value=&quot;Popup without the sprawling parameter&quot; /&gt;
+        &lt;input style=&quot;width: 300px;&quot; type=&quot;button&quot; id=&quot;minWidth&quot; value=&quot;Popup with a minimum width of 320px&quot; /&gt;
+        &lt;script&gt;
+            DG.then(function () {
+                var latLng = DG.latLng([54.98, 82.89]),
+                    map;
+
+                // let&#39;s initialize the map with a width of 300 pixels
+                map = DG.map(&#39;map&#39;, {
+                    center: latLng,
+                    zoom: 13,
+                    fullscreenControl: false,
+                    zoomControl: false
+                });
+
+                // the popup with the enabled sprawling parameter
+                // will strech to the boundaries of the map
+                document.getElementById(&#39;sprawling&#39;).onclick = function () {
+                    DG.popup({
+                        maxWidth: 350,
+                        sprawling: true
+                    })
+                    .setLatLng(latLng)
+                    .setContent(&#39;I am a popup!&#39;)
+                    .openOn(map);
+                };
+
+                // the popup with no sprawling parameter
+                // will adjust to the width of the content
+                document.getElementById(&#39;no-sprawling&#39;).onclick = function () {
+                    DG.popup({
+                        maxWidth: 350
+                    })
+                    .setLatLng(latLng)
+                    .setContent(&#39;I am a popup!&#39;)
+                    .openOn(map);
+                };
+
+                // the popup with a minimum width of  320px
+                // will go outside the boundaries of the map
+                document.getElementById(&#39;minWidth&#39;).onclick = function () {
+                    DG.popup({
+                        maxWidth: 350,
+                        minWidth: 320
+                    })
+                    .setLatLng(latLng)
+                    .setContent(&#39;I am a popup!&#39;)
+                    .openOn(map);
+                };
+            });
+        &lt;/script&gt;
+    &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>

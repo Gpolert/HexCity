@@ -1,0 +1,269 @@
+<h2 id="работа-с попапами">Работа с попапами</h2><p><dl class="api-incut"><ul class="page-contents"><li><a href="#описание">Описание</a></li><li><a href="#открытие-попапа при клике на маркер">Открытие попапа при клике на маркер</a></li><li><a href="#открытие-попапа по умолчанию и по требованию">Открытие попапа по умолчанию и по требованию</a></li><li><a href="#добавление-нескольких попапов на карту">Добавление нескольких попапов на карту</a></li><li><a href="#поведение-попапа с параметром sprawling">Поведение попапа с параметром sprawling</a></li></ul></dl></p>
+<h3 id="описание">Описание</h3><p>Ниже приведены примеры использования попапов. Для получения подробной информации перейдите в раздел документации
+<a href="/doc/maps/ru/manual/popup">Попапы</a>.</p>
+<h3 id="открытие-попапа при клике на маркер">Открытие попапа при клике на маркер</h3><script src="https://maps.api.2gis.ru/2.0/loader.js"></script>
+<div id="map" style="width: 100%; height: 400px;"></div>
+<script>
+    DG.then(function () {
+        var map = DG.map('map', {
+            center: [54.98, 82.89],
+            zoom: 15
+        });
+
+        DG.marker([54.98, 82.89]).addTo(map).bindPopup('Я попап!');
+    });
+</script>
+
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+    &lt;head&gt;
+        &lt;title&gt;Открытие попапа при клике на маркер&lt;/title&gt;
+        &lt;script src=&quot;https://maps.api.2gis.ru/2.0/loader.js&quot;&gt;&lt;/script&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;div id=&quot;map&quot; style=&quot;width: 100%; height: 400px;&quot;&gt;&lt;/div&gt;
+        &lt;script&gt;
+            DG.then(function() {
+                var map = DG.map(&#39;map&#39;, {
+                    center: [54.98, 82.89],
+                    zoom: 15
+                });
+
+                DG.marker([54.98, 82.89]).addTo(map).bindPopup(&#39;Я попап!&#39;);
+            });
+        &lt;/script&gt;
+    &lt;/body&gt;
+&lt;/html&gt;
+</code></pre><h3 id="открытие-попапа по умолчанию и по требованию">Открытие попапа по умолчанию и по требованию</h3><p><input id="showPopup" type="button" value="Открыть попап" /></p>
+<p><div id="map1" style="width: 100%; height: 400px;"></div></p>
+<script>
+    var showButton = document.getElementById('showPopup');
+
+    DG.then(function() {
+        var map,
+            myPopUp;
+
+        map = DG.map('map1', {
+            center: [54.98, 82.89],
+            zoom: 13
+        });
+
+        DG.popup([54.98, 82.89])
+            .setLatLng([54.98, 82.89])
+            .setContent('Я открыт по умолчанию')
+            .openOn(map);
+
+        myPopUp = DG.popup()
+            .setLatLng([54.98, 82.89])
+            .setContent('Я открылся по требованию и закрыл прошлый попап!');
+
+        showButton.onclick = function() {myPopUp.openOn(map)};
+    });
+</script>
+
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+    &lt;head&gt;
+        &lt;title&gt;Открытие попапа по умолчанию и по требованию&lt;/title&gt;
+        &lt;script src=&quot;https://maps.api.2gis.ru/2.0/loader.js&quot;&gt;&lt;/script&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;input id=&quot;showPopup&quot; type=&quot;button&quot; value=&quot;Открыть попап&quot; /&gt;
+        &lt;div id=&quot;map&quot; style=&quot;width: 100%; height: 400px;&quot;&gt;&lt;/div&gt;
+        &lt;script&gt;
+            var showButton = document.getElementById(&#39;showPopup&#39;);
+
+            DG.then(function() {
+                var map,
+                    myPopUp;
+
+                map = DG.map(&#39;map&#39;, {
+                    center: [54.98, 82.89],
+                    zoom: 13
+                });
+
+                DG.popup([54.98, 82.89])
+                    .setLatLng([54.98, 82.89])
+                    .setContent(&#39;Я открыт по умолчанию&#39;)
+                    .openOn(map);
+
+                myPopUp = DG.popup()
+                    .setLatLng([54.98, 82.89])
+                    .setContent(&#39;Я открылся по требованию и закрыл прошлый попап!&#39;);
+
+                showButton.onclick = function() {myPopUp.openOn(map)};
+            });
+        &lt;/script&gt;
+    &lt;/body&gt;
+&lt;/html&gt;
+</code></pre><h3 id="добавление-нескольких попапов на карту">Добавление нескольких попапов на карту</h3><p><div id="map2" style="width: 100%; height: 400px;"></div></p>
+<script>
+    DG.then(function() {
+        var map,
+            popups = DG.featureGroup(),
+            coordinates = [];
+
+        map = DG.map('map2', {
+            center: [54.98, 82.89],
+            zoom: 13
+        });
+
+        for (var i = 0; i < 10; i++) {
+            coordinates[0] = 54.98 - Math.random();
+            coordinates[1] = 82.89 + Math.random();
+            DG.popup()
+                .setLatLng(coordinates)
+                .setContent('Я попап №' + i)
+                .addTo(popups);
+        }
+
+        popups.addTo(map);
+        map.fitBounds(popups.getBounds());
+    });
+</script>
+
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+    &lt;head&gt;
+        &lt;title&gt;Добавление нескольких попапов на карту&lt;/title&gt;
+        &lt;script src=&quot;https://maps.api.2gis.ru/2.0/loader.js&quot;&gt;&lt;/script&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;div id=&quot;map&quot; style=&quot;width: 100%; height: 400px;&quot;&gt;&lt;/div&gt;
+        &lt;script&gt;
+            DG.then(function() {
+                var map,
+                    popups = DG.featureGroup(),
+                    coordinates = [];
+
+                map = DG.map(&#39;map&#39;, {
+                    center: [54.98, 82.89],
+                    zoom: 13
+                });
+
+                // создаем 10 попапов в случайных местах и добавляем их в группу
+                for (var i = 0; i &lt; 10; i++) {
+                    coordinates[0] = 54.98 - Math.random();
+                    coordinates[1] = 82.89 + Math.random();
+                    DG.popup()
+                        .setLatLng(coordinates)
+                        .setContent(&#39;Я попап №&#39; + i)
+                        .addTo(popups);
+                }
+
+                popups.addTo(map);
+
+                // фокусируем область видимости на попапах
+                map.fitBounds(popups.getBounds());
+            });
+        &lt;/script&gt;
+    &lt;/body&gt;
+&lt;/html&gt;
+</code></pre><h3 id="поведение-попапа с параметром sprawling">Поведение попапа с параметром sprawling</h3><p><div id="map3" style="width: 300px; height: 150px;"></div></p>
+<p><input style="width: 300px;" type="button" id="sprawling" value="Попап с включенным параметром sprawling"><br /></p>
+<p><input style="width: 300px;" type="button" id="no-sprawling" value="Попап без параметра sprawling"><br /></p>
+<p><input style="width: 300px;" type="button" id="minWidth" value="Попап с минимальной шириной 320px"></p>
+<script>
+    DG.then(function () {
+        var latLng = DG.latLng([54.98, 82.89]),
+            map = DG.map('map3', {
+                center: latLng,
+                zoom: 13,
+                fullscreenControl: false,
+                zoomControl: false
+            });
+
+        document.getElementById('sprawling').onclick = function () {
+            DG.popup({
+                maxWidth: 350,
+                sprawling: true
+            })
+            .setLatLng(latLng)
+            .setContent('Я попап!')
+            .openOn(map);
+        };
+
+        document.getElementById('no-sprawling').onclick = function () {
+            DG.popup({
+                maxWidth: 350
+            })
+            .setLatLng(latLng)
+            .setContent('Я попап!')
+            .openOn(map);
+        };
+
+        document.getElementById('minWidth').onclick = function () {
+            DG.popup({
+                maxWidth: 350,
+                minWidth: 320
+            })
+            .setLatLng(latLng)
+            .setContent('Я попап!')
+            .openOn(map);
+        };
+    });
+</script>
+
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+    &lt;head&gt;
+        &lt;title&gt;Поведение попапа с параметром sprawling&lt;/title&gt;
+        &lt;script src=&quot;https://maps.api.2gis.ru/2.0/loader.js&quot;&gt;&lt;/script&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;div id=&quot;map&quot; style=&quot;width: 300px; height: 150px;&quot;&gt;&lt;/div&gt;
+        &lt;input style=&quot;width: 300px;&quot; type=&quot;button&quot; id=&quot;sprawling&quot; value=&quot;Попап с включенным параметром sprawling&quot;&gt;&lt;br /&gt;
+        &lt;input style=&quot;width: 300px;&quot; type=&quot;button&quot; id=&quot;no-sprawling&quot; value=&quot;Попап без параметра sprawling&quot;&gt;&lt;br /&gt;
+        &lt;input style=&quot;width: 300px;&quot; type=&quot;button&quot; id=&quot;minWidth&quot; value=&quot;Попап с минимальной шириной 320px&quot;&gt;
+        &lt;script&gt;
+            DG.then(function () {
+                var latLng = DG.latLng([54.98, 82.89]),
+                    map;
+
+                // проинициализируем карту с шириной 300 пикселей
+                map = DG.map(&#39;map&#39;, {
+                    center: latLng,
+                    zoom: 13,
+                    fullscreenControl: false,
+                    zoomControl: false
+                });
+
+                // попап с включенным параметром sprawling
+                // растянется до границ карты
+                document.getElementById(&#39;sprawling&#39;).onclick = function () {
+                    DG.popup({
+                        maxWidth: 350,
+                        sprawling: true
+                    })
+                    .setLatLng(latLng)
+                    .setContent(&#39;Я попап!&#39;)
+                    .openOn(map);
+                };
+
+                // попап без параметра sprawling
+                // подстроится под ширину контента
+                document.getElementById(&#39;no-sprawling&#39;).onclick = function () {
+                    DG.popup({
+                        maxWidth: 350
+                    })
+                    .setLatLng(latLng)
+                    .setContent(&#39;Я попап!&#39;)
+                    .openOn(map);
+                };
+
+                // попап с минимальной шириной 320px
+                // выйдет за границы карты
+                document.getElementById(&#39;minWidth&#39;).onclick = function () {
+                    DG.popup({
+                        maxWidth: 350,
+                        minWidth: 320
+                    })
+                    .setLatLng(latLng)
+                    .setContent(&#39;Я попап!&#39;)
+                    .openOn(map);
+                };
+            });
+        &lt;/script&gt;
+    &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
