@@ -1,0 +1,82 @@
+<h2 id="all-capabilities of 2gis api&amp;sdk">All capabilities of 2GIS API&amp;SDK</h2><p><a href="https://dev.2gis.com/">dev.2gis.com</a></p>
+<h2 id="full-updated documentation">Full updated documentation</h2><p><a href="https://docs.2gis.com/en">docs.2gis.com/en</a></p>
+<h2 id="general-information">General information</h2><p>With maps API you can:</p>
+<ul class="list-v-disc">
+<li><div class="restore-color"><span style="color:323232">create interactive maps on the web page;</span></div></li><li><div class="restore-color"><span style="color:323232">display various objects on the map (markers, pop-ups, geometric objects);</span></div></li><li><div class="restore-color"><span style="color:323232">search on the map: to determine the coordinates of geoobjects by their names and the names by the coordinates.</span></div></li></ul>
+<p>The source code of the maps API is available on <a href="https://github.com/2gis/mapsapi">GitHub</a>, the project is open to suggestions and pull-requests.</p>
+<h3 id="getting-started">Getting started</h3><p>The following is a simple example of creating a map.</p>
+<h4 id="connect-api">Connect API</h4><p>To connect API JavaScript code, add the following code to the head section of the HTML page:</p>
+<pre><code>&lt;script src=&quot;https://maps.api.2gis.ru/2.0/loader.js?pkg=full&quot;&gt;&lt;/script&gt;
+</code></pre><p>If you are interested in including the API code using npm, go to the <a href="/doc/maps/en/manual/dg-loading#npm">Connection API</a> section.</p>
+<h4 id="create-a map container">Create a map container</h4><p>To create a container in which the map will be displayed, you must add a block HTML element of the required size:</p>
+<pre><code>&lt;body&gt;
+    &lt;div id=&quot;map&quot; style=&quot;width:500px; height:400px&quot;&gt;&lt;/div&gt;
+&lt;/body&gt;
+</code></pre><h4 id="create-map">Create map</h4><p>Now everything is prepared for the map creation. To do this, add the following code to the head section:</p>
+<pre><code>&lt;script type=&quot;text/javascript&quot;&gt;
+    var map;
+
+    DG.then(function () {
+        map = DG.map(&#39;map&#39;, {
+            center: [54.98, 82.89],
+            zoom: 13
+        });
+    });
+&lt;/script&gt;
+</code></pre><p>In this example map takes two parameters:</p>
+<ul>
+<li><div class="restore-color"><span style="color:323232">center - the coordinates of the center of the map in the following format [latitude, longitude];</span></div></li><li><div class="restore-color"><span style="color:323232">zoom - the scale factor in the range from 1 to 18.</span></div></li></ul>
+<h4 id="add-marker to the map">Add marker to the map</h4><p>After creating the map you can display a marker on it by adding one line of the code to the previously written one:</p>
+<pre><code>&lt;script type=&quot;text/javascript&quot;&gt;
+    var map;
+
+    DG.then(function () {
+        map = DG.map(&#39;map&#39;, {
+            center: [54.98, 82.89],
+            zoom: 13
+        });
+
+        DG.marker([54.98, 82.89]).addTo(map);
+    });
+&lt;/script&gt;
+</code></pre><h4 id="show-pop-up with information">Show pop-up with information</h4><p>If to extend a little the above added string of the code with a marker, then when clicking on the marker, a popup
+will be displayed (pop up block) with the information you need:</p>
+<pre><code>&lt;script type=&quot;text/javascript&quot;&gt;
+    var map;
+
+    DG.then(function () {
+        map = DG.map(&#39;map&#39;, {
+            center: [54.98, 82.89],
+            zoom: 13
+        });
+
+        DG.marker([54.98, 82.89]).addTo(map).bindPopup(&#39;You&#39;ve clicked on me!&#39;);
+    });
+&lt;/script&gt;
+</code></pre><h4 id="all-together">All together</h4><p>Resulting code:</p>
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+    &lt;head&gt;
+        &lt;title&gt;API карт 2ГИС&lt;/title&gt;
+        &lt;script src=&quot;https://maps.api.2gis.ru/2.0/loader.js?pkg=full&quot;&gt;&lt;/script&gt;
+        &lt;script type=&quot;text/javascript&quot;&gt;
+            var map;
+
+            DG.then(function () {
+                map = DG.map(&#39;map&#39;, {
+                    center: [54.98, 82.89],
+                    zoom: 13
+                });
+
+                DG.marker([54.98, 82.89]).addTo(map).bindPopup(&#39;You have clicked on me!&#39;);
+            });
+        &lt;/script&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;div id=&quot;map&quot; style=&quot;width:500px; height:400px&quot;&gt;&lt;/div&gt;
+    &lt;/body&gt;
+&lt;/html&gt;
+</code></pre><h3 id="further-steps">Further steps</h3><p>Was everything successful? Now you can see the <a href="/doc/maps/en/manual/dg-loading">developer guide</a>
+and <a href="/doc/maps/en/examples/base">examples of use</a>.</p>
+<h3 id="technical-support">Technical support</h3><p>If you have any difficulties in working with the maps API &mdash;
+<a href="mailto:api@2gis.ru">email us</a> and we will help you to solve the problem.</p>
