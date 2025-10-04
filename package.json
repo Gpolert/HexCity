@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "@2gis/mapgl": "^1.65.0",
-    "2gis-maps": "^4.0.10"
-  }
-}
