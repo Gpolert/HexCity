@@ -32,6 +32,7 @@
 
 <script lang="ts" setup>
 import { onMounted, ref } from "vue";
+import { load } from '@2gis/mapgl';
 // @ts-ignore
 import DG from "2gis-maps"; 
 
@@ -54,19 +55,54 @@ const toggleLegend = () => {
   showLegend.value = !showLegend.value;
 };
 
+async function loadAndDrawPolygons(map, mapgl) {
+  try {
+    const response = await fetch('./moscow_hexagons.json');
+    // console.log(response);
+    const hexagons = await response.json();
+
+    hexagons.forEach(coords => {
+      // Преобразуем координаты из [lon, lat] в [lat, lon]
+      const polygonCoords = coords;
+
+      // Закрываем шестиугольник, добавляя первую точку в конец (если требуется)
+      if (
+        polygonCoords.length &&
+        (polygonCoords[0][0] !== polygonCoords[polygonCoords.length - 1][0] ||
+        polygonCoords[0][1] !== polygonCoords[polygonCoords.length - 1][1])
+      ) {
+        polygonCoords.push(polygonCoords[0]);
+      }
+
+      // Рисуем полигон
+      const polygon = new mapgl.Polygon(map, {
+        coordinates: [polygonCoords],
+        color: '#998080aa',
+        strokeWidth: 1,
+        strokeColor: '#35ba24ff',
+      });
+    });
+  } catch (error) {
+    console.error('Ошибка при загрузке или отрисовке:', error);
+  }
+}
+
 onMounted(() => {
-  const map = DG.map("map", {
-    center: [55.751244, 37.618423],
-    zoom: 11,
-    key: import.meta.env.VITE_2GIS_API_KEY,
-    
-    zoomControl: false, 
-    scaleControl: 'bottomRight', 
-    fullscreenControl: false, 
+  load().then(mapgl => {
+    const map = new mapgl.Map("map", {
+      center: [37.618423, 55.751244],
+      zoom: 11,
+      key: import.meta.env.VITE_2GIS_API_KEY,
+      
+      zoomControl: false, 
+      scaleControl: 'bottomRight', 
+      fullscreenControl: false, 
+    });
+
+    loadAndDrawPolygons(map, mapgl);
+    mapInstance.value = map;
   });
-  
-  mapInstance.value = map;
-});
+})
 </script>
 
 <style>
