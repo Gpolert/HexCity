@@ -57,7 +57,7 @@ const toggleLegend = () => {
 
 async function loadAndDrawPolygons(map, mapgl) {
   try {
-    const response = await fetch('./moscow_hexagons.json');
+    const response = await fetch('./moscow_hexagons2 copy.json');
     // console.log(response);
     const hexagons = await response.json();
 
@@ -100,6 +100,7 @@ onMounted(() => {
     });
 
     loadAndDrawPolygons(map, mapgl);
+
     mapInstance.value = map;
   });
 })
