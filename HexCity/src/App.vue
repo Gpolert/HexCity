@@ -71,34 +71,29 @@ const initialZoom = 13;
 const mapInstance = ref<any | null>(null);
 const showLegend = ref(false); 
 
-// ⭐ ОБНОВЛЕННЫЕ ПЕРСОНАЛЬНЫЕ ПАРАМЕТРЫ
+// ⭐ Категория "Досуг" удалена
 const personalParameters = ref({
   Дети: [
-    { label: 'Возраст до 6 лет', checked: false },
-    { label: 'Возраст до 16 лет', checked: false },
+    { label: 'Дети', checked: false },
   ],
   Питомцы: [
     { label: 'Наличие питомцев', checked: false },
   ],
-  "Личный Транспорт": [ // ⭐ Обновлено название категории
-    { label: 'Автомобиль', checked: false }, // ⭐ Обновлено содержимое
-    { label: 'Велосипед', checked: false },   // ⭐ Обновлено содержимое
+  "Личный Транспорт": [ 
+    { label: 'Автомобиль', checked: false },
   ],
-  'Общественный Транспорт': [ // ⭐ Обновлено название категории
+  'Общественный Транспорт': [ 
     { label: 'Автобусы', checked: false },
     { label: 'Трамваи', checked: false },
     { label: 'Метро', checked: false },
     { label: 'Троллейбусы', checked: false },
-  ],
-  Досуг: [
-    { label: 'Культурные мероприятия', checked: false },
-    { label: 'Спорт', checked: false },
   ],
   Семья: [
     { label: 'Большая семья', checked: false },
     { label: 'Пожилые родственники', checked: false },
   ]
 });
+
 
 const showParameters = ref(false); 
 const toggleParameters = () => {
