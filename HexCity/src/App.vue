@@ -1,6 +1,58 @@
 <template>
   <div id="map" style="width: 100%; height: 100vh"></div>
   
+  <div v-if="selectedHexagon" :class="['hexagon-details-widget', { 'open': isDetailsVisible }]">
+    <div class="widget-header">
+      <h4>Оценка района (Гексагон #{{ selectedHexagon.id || 'N/A' }})</h4>
+      <button @click="closeWidget" class="close-btn">&times;</button>
+    </div>
+
+    <div class="metrics-list">
+      
+      <div class="metric-item group-title">Транспорт и Доступность</div>
+      <div class="metric-item">
+        <span class="metric-label">Ср. скорость трафика:</span>
+        <span class="metric-value">{{ (selectedHexagon.avg_speed || 0).toFixed(1) }} км/ч</span>
+      </div>
+      <div class="metric-item">
+        <span class="metric-label">Ср. ограничение скорости:</span>
+        <span class="metric-value">{{ (selectedHexagon.avg_limit || 0).toFixed(1) }} км/ч</span>
+      </div>
+      <div class="metric-item">
+        <span class="metric-label">Кол-во остановок ОТ:</span>
+        <span class="metric-value">{{ selectedHexagon.stop_count || 0 }}</span>
+      </div>
+      <div class="metric-item">
+        <span class="metric-label">Уникальных маршрутов:</span>
+        <span class="metric-value">{{ selectedHexagon.unique_routes_count || 0 }}</span>
+      </div>
+
+      <div class="metric-item group-title">Инфраструктура и Комфорт</div>
+      <div class="metric-item">
+        <span class="metric-label">Кол-во парков:</span>
+        <span class="metric-value">{{ selectedHexagon.count_parks || 0 }}</span>
+      </div>
+      <div class="metric-item">
+        <span class="metric-label">Кол-во школ:</span>
+        <span class="metric-value">{{ selectedHexagon.count_schools || 0 }}</span>
+      </div>
+      <div class="metric-item">
+        <span class="metric-label">Кол-во больниц:</span>
+        <span class="metric-value">{{ selectedHexagon.count_hospitals || 0 }}</span>
+      </div>
+      <div class="metric-item">
+        <span class="metric-label">Кол-во магазинов:</span>
+        <span class="metric-value">{{ selectedHexagon.count_shops || 0 }}</span>
+      </div>
+      <div class="metric-item">
+        <span class="metric-label">Кол-во заводов:</span>
+        <span class="metric-value">{{ selectedHexagon.count_factories || 0 }}</span>
+      </div>
+      
+    </div>
+  </div>
+
+
   <div class="legend-container">
     <button @click="toggleLegend" class="legend-toggle-btn" title="Как оцениваются районы">?</button>
     
@@ -70,8 +122,11 @@ import DG from "2gis-maps";
 const initialZoom = 13; 
 const mapInstance = ref<any | null>(null);
 const showLegend = ref(false); 
+const selectedHexagon = ref<any | null>(null); 
+// ⭐ НОВОЕ: Флаг для управления CSS-переходом виджета деталей
+const isDetailsVisible = ref(false); 
 
-// ⭐ Категория "Досуг" удалена
+
 const personalParameters = ref({
   Дети: [
     { label: 'Дети', checked: false },
@@ -98,6 +153,14 @@ const personalParameters = ref({
 const showParameters = ref(false); 
 const toggleParameters = () => {
   showParameters.value = !showParameters.value;
+};
+
+// ⭐ ИЗМЕНЕНИЕ: Плавное закрытие деталей по крестику
+const closeWidget = () => {
+  isDetailsVisible.value = false;
+  setTimeout(() => {
+    selectedHexagon.value = null;
+  }, 300); // 300ms соответствует CSS-переходу
 };
 
 // Переменные и функции для масштаба
@@ -136,8 +199,23 @@ const zoomOut = () => {
   }
 };
 
+// ⭐ ИЗМЕНЕНИЕ: Плавное закрытие деталей при открытии Легенды
 const toggleLegend = () => {
-  showLegend.value = !showLegend.value;
+  if (selectedHexagon.value) {
+    // 1. Сначала запускаем плавное закрытие деталей
+    isDetailsVisible.value = false; 
+    
+    // 2. Устанавливаем задержку, чтобы Легенда открылась после того, 
+    // как виджет деталей плавно исчезнет (350мс > 300мс transition)
+    setTimeout(() => {
+        selectedHexagon.value = null; // Удаляем из DOM
+        showLegend.value = true; // Открываем легенду
+    }, 350); 
+    
+  } else {
+    // Если виджет Оценка района закрыт, просто переключаем Легенду плавно
+    showLegend.value = !showLegend.value;
+  }
 };
 
 async function loadAndDrawPolygons(map, mapgl) {
@@ -145,10 +223,13 @@ async function loadAndDrawPolygons(map, mapgl) {
     const response = await fetch('./moscow_hexagons_with_POI_final.json');
     const hexagons = await response.json();
 
-    for(let i = 1; i <= 686; i++) {
-      const polygonCoords = hexagons[""+i]["peaks"];
-      const centerCoords = hexagons[""+i]["center"];
-
+    Object.entries(hexagons).forEach(([hexId, hexData]) => {
+      // @ts-ignore
+      const data = hexData; 
+      const polygonCoords = data["peaks"];
+      const centerCoords = data["center"];
+      
+      // Логика замыкания координат для Polygon
       if (
         polygonCoords.length &&
         (polygonCoords[0][0] !== polygonCoords[polygonCoords.length - 1][0] ||
@@ -159,54 +240,39 @@ async function loadAndDrawPolygons(map, mapgl) {
 
       const polygon = new mapgl.Polygon(map, {
         coordinates: [polygonCoords],
-        color: '#998080aa',
+        color: '#998080aa', // Цвет гексагона (полупрозрачный)
         strokeWidth: 1,
-        strokeColor: '#35ba24ff',
+        strokeColor: '#35ba24ff', // Цвет обводки
       });
       
       const marker = new mapgl.Marker(map, {
         coordinates: centerCoords,
-        idx: i
+        idx: hexId, 
       });
 
       marker.on('click', (e) => {
+        // Убеждаемся, что легенда закрывается плавно
+        showLegend.value = false;
         
+        // ⭐ ИЗМЕНЕНИЕ: Сначала устанавливаем данные, затем включаем флаг для плавного появления
+        selectedHexagon.value = { ...data, id: hexId }; 
+        setTimeout(() => {
+            isDetailsVisible.value = true;
+        }, 50); // Небольшая задержка для срабатывания CSS-перехода
       });
-    }
+    });
   } catch (error) {
     console.error('Ошибка при загрузке или отрисовке:', error);
-  } 
-    
-
-  //   hexagons.forEach(coords => {
-  //     const polygonCoords = coords;
-
-  //     if (
-  //       polygonCoords.length &&
-  //       (polygonCoords[0][0] !== polygonCoords[polygonCoords.length - 1][0] ||
-  //       polygonCoords[0][1] !== polygonCoords[polygonCoords.length - 1][1])
-  //     ) {
-  //       polygonCoords.push(polygonCoords[0]);
-  //     }
-
-  //     const polygon = new mapgl.Polygon(map, {
-  //       coordinates: [polygonCoords],
-  //       color: '#998080aa',
-  //       strokeWidth: 1,
-  //       strokeColor: '#35ba24ff',
-  //     });
-  //   });
-  // } catch (error) {
-  //   console.error('Ошибка при загрузке или отрисовке:', error);
-  // }
+  }
 }
 
 onMounted(() => {
   load().then(mapgl => {
+    // ВАЖНО: Замените VITE_2GIS_API_KEY на ваш реальный ключ API
     const map = new mapgl.Map("map", {
       center: [37.618423, 55.751244], 
       zoom: initialZoom,
-      key: import.meta.env.VITE_2GIS_API_KEY,
+      key: import.meta.env.VITE_2GIS_API_KEY, 
       
       zoomControl: false, 
       scaleControl: false, 
@@ -238,6 +304,108 @@ body {
   font-family: 'Roboto', sans-serif;
   overflow: hidden; 
 }
+
+/* --- СТИЛИ ДЛЯ ВИДЖЕТА ДЕТАЛЕЙ ГЕКСАГОНА --- */
+.hexagon-details-widget {
+  position: absolute;
+  top: 60px; 
+  left: 10px;
+  z-index: 1000;
+  width: 300px; 
+  padding: 15px; 
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+  font-size: 14px;
+  
+  /* ⭐ НОВОЕ: Начальное состояние для плавного появления/исчезновения */
+  opacity: 0;
+  transform: translateX(-10px); 
+  transition: opacity 0.3s ease-out, transform 0.3s ease-out; 
+}
+
+/* ⭐ НОВОЕ: Состояние открытия */
+.hexagon-details-widget.open {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+
+.widget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+}
+
+.widget-header h4 {
+  margin: 0;
+  color: #333;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  font-weight: 300;
+  line-height: 1;
+  color: #999;
+  cursor: pointer;
+  padding: 0 5px;
+}
+
+.close-btn:hover {
+  color: #333;
+}
+
+.metrics-list {
+  padding-top: 5px;
+}
+
+.group-title {
+    font-weight: bold;
+    color: #007bff;
+    padding-top: 10px !important;
+    padding-bottom: 4px !important;
+    border-bottom: 1px solid #cce5ff !important;
+    margin-top: 5px;
+}
+
+.metric-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px dashed #f0f0f0;
+}
+
+.total-score-row {
+    margin-top: 10px;
+    padding-top: 10px !important;
+    border-top: 2px solid #333 !important; 
+    border-bottom: none !important;
+}
+
+.metric-label {
+  color: #555;
+  font-weight: 400;
+}
+
+.metric-value {
+  color: #007bff;
+  font-weight: 600;
+}
+
+.metric-value.final-score {
+  color: #5cb85c;
+  font-size: 16px;
+  font-weight: bold;
+}
+/* --- КОНЕЦ СТИЛЕЙ ВИДЖЕТА ДЕТАЛЕЙ --- */
+
 
 /* --- СТИЛИ ПЕРСОНАЛЬНЫХ ПАРАМЕТРОВ (ПРАВЫЙ ВЕРХНИЙ УГОЛ) --- */
 
@@ -442,6 +610,7 @@ body {
   background-color: #f0f0f0;
 }
 
+/* Стиль для плавного открытия/закрытия легенды */
 .legend-widget {
   width: 250px;
   padding: 0 15px; 
@@ -452,6 +621,7 @@ body {
   overflow: hidden; 
   max-height: 0; 
   opacity: 0;
+  /* Ключевой transition для плавности */
   transition: max-height 0.4s ease-in-out, opacity 0.4s ease-in-out, padding 0.4s;
 }
 
