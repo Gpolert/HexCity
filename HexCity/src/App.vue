@@ -181,6 +181,13 @@ const closeWidget = () => {
   }, 300); // 300ms соответствует CSS-переходу
 };
 
+const closeHexagonDetails = () => {
+  isDetailsVisible.value = false;
+  setTimeout(() => {
+    selectedHexagon.value = null;
+  }, 300); // 300ms соответствует CSS-переходу
+};
+
 
 const showParameters = ref(false); 
 const toggleParameters = () => {
@@ -224,6 +231,11 @@ const zoomOut = () => {
 };
 
 const toggleLegend = () => {
+  // If hexagon details widget is open, close it smoothly
+  if (isDetailsVisible.value && selectedHexagon.value) {
+    closeHexagonDetails();
+  }
+  
   showLegend.value = !showLegend.value;
 };
 
