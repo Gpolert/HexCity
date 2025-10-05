@@ -69,7 +69,7 @@
 
 1.  **Клонируйте репозиторий:**
     ```bash
-    git clone [ваша ссылка на репозиторий]
+    git clone https://github.com/Gpolert/HexCity.git
     cd HexCity
     ```
 2.  **Установите зависимости:**
