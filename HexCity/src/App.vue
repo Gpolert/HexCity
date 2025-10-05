@@ -142,11 +142,12 @@ const toggleLegend = () => {
 
 async function loadAndDrawPolygons(map, mapgl) {
   try {
-    const response = await fetch('./moscow_hexagons2 copy.json');
+    const response = await fetch('./moscow_hexagons_with_POI_final.json');
     const hexagons = await response.json();
 
-    hexagons.forEach(coords => {
-      const polygonCoords = coords;
+    for(let i = 1; i <= 686; i++) {
+      const polygonCoords = hexagons[""+i]["peaks"];
+      const centerCoords = hexagons[""+i]["center"];
 
       if (
         polygonCoords.length &&
@@ -162,10 +163,42 @@ async function loadAndDrawPolygons(map, mapgl) {
         strokeWidth: 1,
         strokeColor: '#35ba24ff',
       });
-    });
+      
+      const marker = new mapgl.Marker(map, {
+        coordinates: centerCoords,
+        idx: i
+      });
+
+      marker.on('click', (e) => {
+        
+      });
+    }
   } catch (error) {
     console.error('Ошибка при загрузке или отрисовке:', error);
-  }
+  } 
+    
+
+  //   hexagons.forEach(coords => {
+  //     const polygonCoords = coords;
+
+  //     if (
+  //       polygonCoords.length &&
+  //       (polygonCoords[0][0] !== polygonCoords[polygonCoords.length - 1][0] ||
+  //       polygonCoords[0][1] !== polygonCoords[polygonCoords.length - 1][1])
+  //     ) {
+  //       polygonCoords.push(polygonCoords[0]);
+  //     }
+
+  //     const polygon = new mapgl.Polygon(map, {
+  //       coordinates: [polygonCoords],
+  //       color: '#998080aa',
+  //       strokeWidth: 1,
+  //       strokeColor: '#35ba24ff',
+  //     });
+  //   });
+  // } catch (error) {
+  //   console.error('Ошибка при загрузке или отрисовке:', error);
+  // }
 }
 
 onMounted(() => {
