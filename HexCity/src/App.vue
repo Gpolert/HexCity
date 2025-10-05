@@ -1,6 +1,6 @@
 <template>
   <div id="map" style="width: 100%; height: 100vh"></div>
-  
+
   <div v-if="selectedHexagon" :class="['hexagon-details-widget', { 'open': isDetailsVisible }]">
     <div class="widget-header">
       <h4>Оценка района (Гексагон #{{ selectedHexagon.id || 'N/A' }})</h4>
@@ -51,8 +51,20 @@
       
     </div>
   </div>
-
-
+  
+  <div v-if="selectedHexagonId" class="info-widget">
+    <h3>Параметры Гексагона #{{ selectedHexagonId }}</h3>
+    
+    <div v-if="isFetchingRating">
+      Загрузка рейтинга...
+    </div>
+    <div v-else-if="hexagonRating !== null">
+      🏆 **Рейтинг:** <strong style="font-size: 1.2em; color: green;">{{ hexagonRating.toFixed(2) }}</strong>
+    </div>
+    <div v-else>
+      Рейтинг не получен. Проверьте консоль или бэкенд.
+    </div>
+  </div>
   <div class="legend-container">
     <button @click="toggleLegend" class="legend-toggle-btn" title="Как оцениваются районы">?</button>
     
@@ -69,7 +81,7 @@
         <span>Средний рейтинг</span>
       </div>
       <div class="legend-item">
-        <span class="color-box green"></span>
+        <span class="color-box blue"></span>
         <span>Высокий рейтинг</span>
       </div>
       <p class="mt-2">
@@ -121,46 +133,58 @@ import DG from "2gis-maps";
 
 const initialZoom = 13; 
 const mapInstance = ref<any | null>(null);
+const mapglInstance = ref<any | null>(null);
 const showLegend = ref(false); 
 const selectedHexagon = ref<any | null>(null); 
-// ⭐ НОВОЕ: Флаг для управления CSS-переходом виджета деталей
 const isDetailsVisible = ref(false); 
 
+// Store references to polygons, markers and their data for color updates
+const hexagonData = ref<{[key: string]: any}>({}); // key: hexId, value: polygon data
+const hexagonPolygons = ref<{[key: string]: any}>({}); // key: hexId, value: polygon object
+const hexagonMarkers = ref<{[key: string]: any}>({}); // key: hexId, value: marker object
 
+// Новые реактивные переменные для данных виджета
+const selectedHexagonId = ref<number | null>(null); // ID выбранного гексагона
+const hexagonRating = ref<number | null>(null);    // Рейтинг
+const isFetchingRating = ref(false);               // Состояние загрузки
+
+// ⭐ ОБНОВЛЕНО: Поле 'param' соответствует именам флагов бэкенда
 const personalParameters = ref({
+  "Режим застройщика": [ // НОВЫЙ ПАРАМЕТР
+    { label: 'Режим застройщика', checked: false, param: 'builder_flg' },
+  ],
   Дети: [
-    { label: 'Дети', checked: false },
+    { label: 'Наличие детей', checked: false, param: 'parent_flg' }, 
   ],
   Питомцы: [
-    { label: 'Наличие питомцев', checked: false },
+    { label: 'Наличие питомцев', checked: false, param: 'pet_owner_flg' }, 
   ],
   "Личный Транспорт": [ 
-    { label: 'Автомобиль', checked: false },
+    { label: 'Водитель автомобиля', checked: false, param: 'driver_flg' },
   ],
   'Общественный Транспорт': [ 
-    { label: 'Автобусы', checked: false },
-    { label: 'Трамваи', checked: false },
-    { label: 'Метро', checked: false },
-    { label: 'Троллейбусы', checked: false },
+    // Поскольку бэкенд ожидает один флаг 'uses_public_transport_flg', 
+    // для простоты объединим все опции под один флаг в параметрах запроса
+    { label: 'Использую общественный транспорт', checked: false, param: 'uses_public_transport_flg' },
+    // Старые детализированные флажки (Автобусы, Трамваи, Метро, Троллейбусы) удалены или объединены
   ],
   Семья: [
-    { label: 'Большая семья', checked: false },
-    { label: 'Пожилые родственники', checked: false },
+    { label: 'Большая семья', checked: false, param: 'big_family_flg' },
+    { label: 'Пожилые родственники', checked: false, param: 'old_family_flg' },
   ]
 });
 
-
-const showParameters = ref(false); 
-const toggleParameters = () => {
-  showParameters.value = !showParameters.value;
-};
-
-// ⭐ ИЗМЕНЕНИЕ: Плавное закрытие деталей по крестику
 const closeWidget = () => {
   isDetailsVisible.value = false;
   setTimeout(() => {
     selectedHexagon.value = null;
   }, 300); // 300ms соответствует CSS-переходу
+};
+
+
+const showParameters = ref(false); 
+const toggleParameters = () => {
+  showParameters.value = !showParameters.value;
 };
 
 // Переменные и функции для масштаба
@@ -199,24 +223,123 @@ const zoomOut = () => {
   }
 };
 
-// ⭐ ИЗМЕНЕНИЕ: Плавное закрытие деталей при открытии Легенды
 const toggleLegend = () => {
-  if (selectedHexagon.value) {
-    // 1. Сначала запускаем плавное закрытие деталей
-    isDetailsVisible.value = false; 
-    
-    // 2. Устанавливаем задержку, чтобы Легенда открылась после того, 
-    // как виджет деталей плавно исчезнет (350мс > 300мс transition)
-    setTimeout(() => {
-        selectedHexagon.value = null; // Удаляем из DOM
-        showLegend.value = true; // Открываем легенду
-    }, 350); 
-    
+  showLegend.value = !showLegend.value;
+};
+
+// Function to determine color based on rating
+const getHexagonColorByRating = (rating: number | null): string => {
+  if (rating === null) return '#998080aa';
+  
+  if (rating < 20000) {
+    return '#d9534faa'; // Red for low rating
+  } else if (rating >= 20000 && rating < 60000) {
+    return '#f0ad4eaa'; // Orange for medium rating
   } else {
-    // Если виджет Оценка района закрыт, просто переключаем Легенду плавно
-    showLegend.value = !showLegend.value;
+    return '#20bdc87e'; // Blue for high rating
   }
 };
+
+// Function to update polygon color
+const updateHexagonColor = (hexId: string, color: string) => {
+  const data = hexagonData.value[hexId];
+  if (data && mapInstance.value && mapglInstance.value) {
+    const polygonCoords = data["peaks"];
+    const centerCoords = data["center"];
+    
+    // Логика замыкания координат для Polygon
+    if (
+      polygonCoords.length &&
+      (polygonCoords[0][0] !== polygonCoords[polygonCoords.length - 1][0] ||
+      polygonCoords[0][1] !== polygonCoords[polygonCoords.length - 1][1])
+    ) {
+      polygonCoords.push(polygonCoords[0]);
+    }
+    
+    // Remove the old polygon and marker
+    if (hexagonPolygons.value[hexId]) {
+      hexagonPolygons.value[hexId].destroy();
+    }
+    if (hexagonMarkers.value[hexId]) {
+      hexagonMarkers.value[hexId].destroy();
+    }
+    
+    // Create a new polygon with the updated color
+    const newPolygon = new mapglInstance.value.Polygon(mapInstance.value, {
+      coordinates: [polygonCoords],
+      color: color,
+      strokeWidth: 1,
+      strokeColor: '#35ba24ff',
+    });
+    
+    // Create a new marker
+    const newMarker = new mapglInstance.value.Marker(mapInstance.value, {
+      coordinates: centerCoords
+    });
+    
+    // Store the new references
+    hexagonPolygons.value[hexId] = newPolygon;
+    hexagonMarkers.value[hexId] = newMarker;
+    
+    // Attach the click event listener to the new marker
+    newMarker.on('click', (e) => {
+      fetchHexagonRating(Number(hexId));
+      showLegend.value = false;
+      selectedHexagon.value = { ...data, id: hexId }; 
+      setTimeout(() => {
+          isDetailsVisible.value = true;
+      }, 50);
+    });
+  }
+};
+
+async function fetchHexagonRating(hexagonId: number) {
+  isFetchingRating.value = true;
+  selectedHexagonId.value = hexagonId;
+  hexagonRating.value = null; 
+
+  const urlParams = new URLSearchParams();
+
+  for (const category in personalParameters.value) {
+    const items = personalParameters.value[category as keyof typeof personalParameters.value]; 
+    
+    items.forEach(item => {
+      if (item.checked) {
+        urlParams.append(item.param, 'True'); 
+      }
+    });
+  }
+  
+  const paramsString = urlParams.toString().length > 0 ? `?${urlParams.toString()}` : '';
+
+  const url = `http://127.0.0.1:8000/hexagons/${hexagonId}/metrics${paramsString}`;
+  console.log('Отправка GET-запроса на URL:', url);
+
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    
+    // 4. Обрабатываем ответ
+    if (data && typeof data.rating === 'number') {
+      hexagonRating.value = data.rating;
+      
+      // Update the hexagon color based on the rating
+      const color = getHexagonColorByRating(data.rating);
+      updateHexagonColor(hexagonId.toString(), color);
+    } else {
+      console.error('Неверный формат ответа:', data);
+      hexagonRating.value = null; 
+    }
+  } catch (error) {
+    console.error('Ошибка при получении рейтинга:', error);
+    hexagonRating.value = null;
+  } finally {
+    isFetchingRating.value = false;
+  }
+}
 
 async function loadAndDrawPolygons(map, mapgl) {
   try {
@@ -240,18 +363,23 @@ async function loadAndDrawPolygons(map, mapgl) {
 
       const polygon = new mapgl.Polygon(map, {
         coordinates: [polygonCoords],
-        color: '#998080aa', // Цвет гексагона (полупрозрачный)
+        color: '#998080aa', // Цвет гексагона (серый по умолчанию)
         strokeWidth: 1,
         strokeColor: '#35ba24ff', // Цвет обводки
       });
       
       const marker = new mapgl.Marker(map, {
-        coordinates: centerCoords,
-        idx: hexId, 
+        coordinates: centerCoords
       });
-
+      
+      // Store references to polygon, marker and data for later color updates
+      hexagonPolygons.value[hexId] = polygon;
+      hexagonMarkers.value[hexId] = marker;
+      hexagonData.value[hexId] = data;
+      
       marker.on('click', (e) => {
-        // Убеждаемся, что легенда закрывается плавно
+        fetchHexagonRating(Number(hexId));
+        // Убеждаемся, что легенда закрывается плавн
         showLegend.value = false;
         
         // ⭐ ИЗМЕНЕНИЕ: Сначала устанавливаем данные, затем включаем флаг для плавного появления
@@ -268,20 +396,20 @@ async function loadAndDrawPolygons(map, mapgl) {
 
 onMounted(() => {
   load().then(mapgl => {
-    // ВАЖНО: Замените VITE_2GIS_API_KEY на ваш реальный ключ API
     const map = new mapgl.Map("map", {
       center: [37.618423, 55.751244], 
       zoom: initialZoom,
-      key: import.meta.env.VITE_2GIS_API_KEY, 
+      key: import.meta.env.VITE_2GIS_API_KEY,
       
       zoomControl: false, 
       scaleControl: false, 
       fullscreenControl: false, 
     });
 
-    loadAndDrawPolygons(map, mapgl);
-
     mapInstance.value = map;
+    mapglInstance.value = mapgl;
+    
+    loadAndDrawPolygons(map, mapgl);
     
     map.on('zoom', () => {
       currentZoom.value = map.getZoom();
@@ -305,106 +433,26 @@ body {
   overflow: hidden; 
 }
 
-/* --- СТИЛИ ДЛЯ ВИДЖЕТА ДЕТАЛЕЙ ГЕКСАГОНА --- */
-.hexagon-details-widget {
-  position: absolute;
-  top: 60px; 
-  left: 10px;
+/* --- СТИЛИ ВИДЖЕТА РЕЙТИНГА (НОВЫЙ) --- */
+.info-widget {
+  position: absolute; 
+  top: 10px; 
+  right: 370px; /* Сдвиг, чтобы не перекрывал Params-Widget */
   z-index: 1000;
-  width: 300px; 
+  background: white; 
   padding: 15px; 
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
-  font-size: 14px;
-  
-  /* ⭐ НОВОЕ: Начальное состояние для плавного появления/исчезновения */
-  opacity: 0;
-  transform: translateX(-10px); 
-  transition: opacity 0.3s ease-out, transform 0.3s ease-out; 
+  border-radius: 8px; 
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  width: 250px;
 }
 
-/* ⭐ НОВОЕ: Состояние открытия */
-.hexagon-details-widget.open {
-  opacity: 1;
-  transform: translateX(0);
-}
-
-
-.widget-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 2px solid #eee;
-  padding-bottom: 10px;
+.info-widget h3 {
+  margin-top: 0;
+  font-size: 16px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 5px;
   margin-bottom: 10px;
 }
-
-.widget-header h4 {
-  margin: 0;
-  color: #333;
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.close-btn {
-  background: none;
-  border: none;
-  font-size: 24px;
-  font-weight: 300;
-  line-height: 1;
-  color: #999;
-  cursor: pointer;
-  padding: 0 5px;
-}
-
-.close-btn:hover {
-  color: #333;
-}
-
-.metrics-list {
-  padding-top: 5px;
-}
-
-.group-title {
-    font-weight: bold;
-    color: #007bff;
-    padding-top: 10px !important;
-    padding-bottom: 4px !important;
-    border-bottom: 1px solid #cce5ff !important;
-    margin-top: 5px;
-}
-
-.metric-item {
-  display: flex;
-  justify-content: space-between;
-  padding: 6px 0;
-  border-bottom: 1px dashed #f0f0f0;
-}
-
-.total-score-row {
-    margin-top: 10px;
-    padding-top: 10px !important;
-    border-top: 2px solid #333 !important; 
-    border-bottom: none !important;
-}
-
-.metric-label {
-  color: #555;
-  font-weight: 400;
-}
-
-.metric-value {
-  color: #007bff;
-  font-weight: 600;
-}
-
-.metric-value.final-score {
-  color: #5cb85c;
-  font-size: 16px;
-  font-weight: bold;
-}
-/* --- КОНЕЦ СТИЛЕЙ ВИДЖЕТА ДЕТАЛЕЙ --- */
 
 
 /* --- СТИЛИ ПЕРСОНАЛЬНЫХ ПАРАМЕТРОВ (ПРАВЫЙ ВЕРХНИЙ УГОЛ) --- */
@@ -610,7 +658,6 @@ body {
   background-color: #f0f0f0;
 }
 
-/* Стиль для плавного открытия/закрытия легенды */
 .legend-widget {
   width: 250px;
   padding: 0 15px; 
@@ -621,7 +668,6 @@ body {
   overflow: hidden; 
   max-height: 0; 
   opacity: 0;
-  /* Ключевой transition для плавности */
   transition: max-height 0.4s ease-in-out, opacity 0.4s ease-in-out, padding 0.4s;
 }
 
@@ -661,9 +707,9 @@ body {
   border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.color-box.red { background-color: #d9534f; } 
-.color-box.orange { background-color: #f0ad4e; } 
-.color-box.green { background-color: #5cb85c; } 
+.color-box.red { background-color: #d9534faa; } 
+.color-box.orange { background-color: #f0ad4eaa; } 
+.color-box.blue { background-color: #20bdc87e; } 
 
 /* --- КОНТРОЛЫ МАСШТАБА (ЛЕВЫЙ НИЖНИЙ УГОЛ) --- */
 .bottom-left-controls {
@@ -721,6 +767,105 @@ body {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   font-size: 16px; 
   text-align: center; 
+  font-weight: bold;
+}
+
+.hexagon-details-widget {
+  position: absolute;
+  top: 60px; 
+  left: 10px;
+  z-index: 1000;
+  width: 300px; 
+  padding: 15px; 
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+  font-size: 14px;
+  
+  /* ⭐ НОВОЕ: Начальное состояние для плавного появления/исчезновения */
+  opacity: 0;
+  transform: translateX(-10px); 
+  transition: opacity 0.3s ease-out, transform 0.3s ease-out; 
+}
+
+/* ⭐ НОВОЕ: Состояние открытия */
+.hexagon-details-widget.open {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+
+.widget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+}
+
+.widget-header h4 {
+  margin: 0;
+  color: #333;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  font-weight: 300;
+  line-height: 1;
+  color: #999;
+  cursor: pointer;
+  padding: 0 5px;
+}
+
+.close-btn:hover {
+  color: #333;
+}
+
+.metrics-list {
+  padding-top: 5px;
+}
+
+.group-title {
+    font-weight: bold;
+    color: #007bff;
+    padding-top: 10px !important;
+    padding-bottom: 4px !important;
+    border-bottom: 1px solid #cce5ff !important;
+    margin-top: 5px;
+}
+
+.metric-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px dashed #f0f0f0;
+}
+
+.total-score-row {
+    margin-top: 10px;
+    padding-top: 10px !important;
+    border-top: 2px solid #333 !important; 
+    border-bottom: none !important;
+}
+
+.metric-label {
+  color: #555;
+  font-weight: 400;
+}
+
+.metric-value {
+  color: #007bff;
+  font-weight: 600;
+}
+
+.metric-value.final-score {
+  color: #5cb85c;
+  font-size: 16px;
   font-weight: bold;
 }
 </style>
